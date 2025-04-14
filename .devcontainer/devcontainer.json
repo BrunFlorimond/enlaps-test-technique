@@ -1,0 +1,52 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+	"name": "Existing Dockerfile",
+	"build": {
+		// Sets the run context to one level up instead of the .devcontainer folder.
+		"context": "..",
+		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+		"dockerfile": "../docker/Dockerfile"
+		
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.debugpy",
+				"ms-python.vscode-pylance",
+				"ms-python.black-formatter",
+				"ms-python.pylint",
+				"AmazonWebServices.aws-toolkit-vscode",
+				"Boto3typed.boto3-ide",
+				"aws-scripting-guy.cform",
+				"ms-python.isort"
+			]
+		},
+		"settings": {
+			"editor.defaultFormatter": "ms-python.black-formatter",
+			"python.formatting.provider": "black",
+			"editor.formatOnSave": true,
+			"python.envFile": "/app/enlaps/.env"
+		}
+		
+	},
+	"mounts": ["source=/home/brun/.ssh,target=/root/.ssh,type=bind"],
+	"postCreateCommand": "chmod 700 /root/.ssh && chmod 600 /root/.ssh",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/app/enlaps,type=bind",
+	"workspaceFolder": "/app/enlaps",
+	"postStartCommand": "/app/python-env/python3.13/bin/pip3.13 install -r requirements.txt"
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Uncomment the next line to run commands after the container is created.
+	// "postCreateCommand": "/app/connect_4/connect_4/bin/activate"
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "devcontainer"
+}
+

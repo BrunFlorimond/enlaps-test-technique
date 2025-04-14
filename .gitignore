@@ -1,0 +1,13 @@
+# Ignorer les dossiers redondants <ABC>/<ABC>
+src/lambdas-layer/*/*/
+
+# Ignorer les dossiers "python"
+src/lambdas-layer/*/python/
+
+# Ignorer les fichiers "layer.zip"
+src/lambdas-layer/*/layer.zip
+
+*.pyc
+
+*.zip
+
