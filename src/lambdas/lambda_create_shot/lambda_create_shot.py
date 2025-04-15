@@ -1,8 +1,8 @@
 """Lambda to create product in dynamo DB table"""
-
+import os
 import json
 import logging
-
+import boto3
 
 from pydantic import ValidationError
 
@@ -10,10 +10,15 @@ from src.model.base.base_modelling import TikeeShotSide
 from src.model.business.business_modelling import NewTikeeShot
 from src.model.orm.orm_modelling import ORMTikeeShot
 from src.services.tikee_shot_service import TikeeShotServices
+from src.constants.constants import LAMBDA_STITCHER, AWS_REGION, AWS_ACCOUNT_ID
 
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
+
+lambda_client = boto3.client('lambda')
 
 
 def lambda_handler(event, _):
@@ -29,13 +34,29 @@ def lambda_handler(event, _):
             new_tikee_shot.sequence,
             new_tikee_shot.photo_index,
         )
+        other_side = get_photo_with_side(
+                TikeeShotSide(new_tikee_shot.side).opposite_side(), photos_with_same_index
+            )
         if is_same_resolution(
             new_tikee_shot.to_orm(),
-            get_other_side_photo(
-                TikeeShotSide(new_tikee_shot.side), photos_with_same_index
-            ),
+            other_side,
         ):
-            orm_tikee_shot = TikeeShotServices().create(new_tikee_shot)
+            orm_tikee_shot = tikee_shot_service.create(new_tikee_shot)
+            if other_side is not None:
+                photos_with_same_index.append(orm_tikee_shot)
+                left_side: ORMTikeeShot | None = get_photo_with_side(TikeeShotSide.LEFT, photos_with_same_index)
+                right_side: ORMTikeeShot | None = get_photo_with_side(TikeeShotSide.RIGHT, photos_with_same_index)
+                if left_side is not None and right_side is not None:
+                    input = json.dumps({"body":
+                        {
+                            "left_side_s3_path": left_side.build_s3_path(),
+                            "right_side_s3_path": right_side.build_s3_path()
+                        }})
+                    lambda_client.invoke(
+                        FunctionName=f"arn:aws:lambda:{AWS_REGION}:{int(AWS_ACCOUNT_ID)}:function:{LAMBDA_STITCHER}",
+                        InvocationType='Event',
+                        Payload=input
+                    )
         else:
             raise ValueError(
                 f"Resolution mismatch: The other side does not have the same resolution for camera {new_tikee_shot.camera_id}."
@@ -73,28 +94,26 @@ def lambda_handler(event, _):
     return response
 
 
-def get_other_side_photo(
-    current_side: TikeeShotSide, tikee_shots: list[ORMTikeeShot]
-) -> ORMTikeeShot | None:
+def get_photo_with_side(side: TikeeShotSide, tikee_shots: list[ORMTikeeShot]) -> ORMTikeeShot | None:
     """
-    Returns the tikee shot that belongs to the opposite side of the current shot.
+    Return the first tikee shot from the provided list that matches the specified side.
 
-    This function searches through the provided list of tikee shots and returns the first shot
-    whose side is opposite to the given current_side. If no such shot exists, the function returns None.
+    This function iterates through the supplied list of tikee shots and returns the first shot
+    whose side equals the provided side. If no such shot is found, it returns None.
 
     Args:
-        current_side (TikeeShotSide): The side of the current tikee shot.
+        side (TikeeShotSide): The side to filter the tikee shots by.
         tikee_shots (list[ORMTikeeShot]): A list of tikee shots to search through.
 
     Returns:
-        ORMTikeeShot | None: The tikee shot on the opposite side if found; otherwise, None.
+        ORMTikeeShot | None: The first tikee shot matching the specified side, or None if no match exists.
     """
     filtered = [
         tikee_shot
         for tikee_shot in tikee_shots
-        if TikeeShotSide(tikee_shot.side) == current_side.opposite_side()
+        if TikeeShotSide(tikee_shot.side) == side
     ]
-    return filtered[0] if len(filtered) > 0 else None
+    return filtered[0] if filtered else None
 
 
 def is_same_resolution(side_1: ORMTikeeShot, side_2: ORMTikeeShot | None) -> bool:

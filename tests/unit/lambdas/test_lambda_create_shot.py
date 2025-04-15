@@ -41,10 +41,11 @@ def test_create_new_shot_no_existing_shot(tikee_shot_table, valid_event):
     assert body["data"]["resolution"] == "1920x1080"
 
 @mock_aws
-def test_create_new_shot_with_matching_resolution(tikee_shot_table, valid_event):
+def test_create_new_shot_with_matching_resolution(tikee_shot_table, valid_event, stitcher_lambda):
     """Test creating a new shot when other side exists with same resolution"""
     # Setup
     table = tikee_shot_table.create_tikee_shot_table()
+    lambda_client = stitcher_lambda.create_stitcher_lambda()
     service = TikeeShotServices()
     
     # Create the right side shot first
