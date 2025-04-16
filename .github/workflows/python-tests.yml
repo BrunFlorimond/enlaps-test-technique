@@ -7,6 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: /app/enlaps
 
     steps:
     - uses: actions/checkout@v3
@@ -22,12 +25,8 @@ jobs:
         pip install -r requirements.txt
         pip install pytest-cov
         
-    - name: Load environment variables
-      run: |
-        source .env
         
     - name: Run tests
-      env:
-        PYTHONPATH: ${{ github.workspace }}
       run: |
+        source .env
         pytest tests/ --cov=app --cov-report=xml 
