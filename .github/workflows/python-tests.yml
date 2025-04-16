@@ -7,15 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: /app/enlaps
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        path: /app/enlaps
+    - uses: actions/checkout@v3
     
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -32,4 +26,5 @@ jobs:
     - name: Run tests
       run: |
         source .env
+        export PYTHONPATH=${{ github.workspace }}
         pytest tests/ --cov=app --cov-report=xml 
