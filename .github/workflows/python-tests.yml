@@ -14,7 +14,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.13'
         
     - name: Install dependencies
       run: |
@@ -23,5 +23,7 @@ jobs:
         pip install pytest-cov
         
     - name: Run tests
+      env:
+        PYTHONPATH: ${{ github.workspace }}
       run: |
         pytest tests/ --cov=app --cov-report=xml 
