@@ -22,9 +22,13 @@ jobs:
         pip install -r requirements.txt
         pip install pytest-cov
         
+    - name: Load environment variables
+      run: |
+        if [ -f .env ]; then
+          export $(cat .env | xargs)
+        fi
         
     - name: Run tests
       run: |
-        source .env
         export PYTHONPATH=${{ github.workspace }}
         pytest tests/ --cov=app --cov-report=xml 
