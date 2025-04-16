@@ -3,8 +3,9 @@
 import boto3
 import pytest
 import src.constants.constants as constants
-
 import json
+import io
+import zipfile
 
 
 @pytest.fixture()
@@ -63,14 +64,19 @@ def stitcher_lambda():
                 AssumeRolePolicyDocument=json.dumps(assume_role_policy_document)
             )
 
+            # Create a mock zip file with a dummy lambda function
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                zip_file.writestr('lambda_function.py', 'def lambda_handler(event, context):\n    return {"statusCode": 200}')
+
             # Create mock lambda
             lambda_client = boto3.client('lambda', constants.AWS_REGION)
             lambda_client.create_function(
                 FunctionName=constants.LAMBDA_STITCHER,
                 Runtime='python3.13',
                 Role=f"arn:aws:iam::123456789012:role/lambda-test-role",
-                Handler='lambda_create_stich.lambda_handler',
-                Code={'ZipFile': b'dummy code'},
+                Handler='lambda_function.lambda_handler',
+                Code={'ZipFile': zip_buffer.getvalue()},
             )
 
             return lambda_client, iam_client
