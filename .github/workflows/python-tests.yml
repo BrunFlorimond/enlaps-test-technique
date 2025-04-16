@@ -25,9 +25,3 @@ jobs:
     - name: Run tests
       run: |
         pytest tests/ --cov=app --cov-report=xml 
-        
-    - name: Upload coverage reports
-      uses: actions/upload-artifact@v3
-      with:
-        name: coverage-reports
-        path: coverage.xml 
