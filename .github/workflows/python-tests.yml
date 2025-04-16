@@ -31,6 +31,4 @@ jobs:
         
     - name: Run tests
       run: |
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-        pytest tests/ --cov=app --cov-report=xml 
+        pytest tests/ --cov=app --cov-report=xml
