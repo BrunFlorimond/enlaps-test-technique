@@ -25,5 +25,9 @@ jobs:
     - name: Run tests
       env:
         PYTHONPATH: ${{ github.workspace }}
+        AWS_DEFAULT_REGION: us-east-1
+        AWS_ACCESS_KEY_ID: test
+        AWS_SECRET_ACCESS_KEY: test
+        MOTO_ALLOW_NONEXISTENT_REGION: true
       run: |
         pytest tests/ --cov=app --cov-report=xml 
