@@ -2,6 +2,7 @@ boto3
 moto
 pytest
 pydantic
+docker
 
 
 

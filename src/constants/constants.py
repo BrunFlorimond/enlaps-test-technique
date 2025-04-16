@@ -35,3 +35,7 @@ DDB_KEYS = (
     .get("Properties", {})
     .get("KeySchema")
 )
+AWS_REGION = os.environ.get("AWS_REGION")
+AWS_ACCOUNT_ID = os.environ.get("AWS_ACCOUNT_ID")
+
+LAMBDA_STITCHER = os.environ.get("LAMBDA_STITCHER")

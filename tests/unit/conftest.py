@@ -4,6 +4,8 @@ import boto3
 import pytest
 import src.constants.constants as constants
 
+import json
+
 
 @pytest.fixture()
 def tikee_shot_table():
@@ -32,3 +34,45 @@ def tikee_shot_table():
             return table
 
     return MockedDDBConstructor()
+
+@pytest.fixture()
+def stitcher_lambda():
+
+    class MockedLambdaStitcherConstructor:
+        """Create a mocked lambda stitcher"""
+
+        def create_stitcher_lambda(self):
+            """Create mocked Lambda"""
+            iam_client = boto3.client('iam')
+
+            assume_role_policy_document = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }
+                ]
+            }
+
+            role_response = iam_client.create_role(
+                RoleName='lambda-test-role',
+                AssumeRolePolicyDocument=json.dumps(assume_role_policy_document)
+            )
+
+            # Create mock lambda
+            lambda_client = boto3.client('lambda')
+            lambda_client.create_function(
+                FunctionName=constants.LAMBDA_STITCHER,
+                Runtime='python3.13',
+                Role=f"arn:aws:iam::123456789012:role/lambda-test-role",
+                Handler='lambda_create_stich.lambda_handler',
+                Code={'ZipFile': b'dummy code'},
+            )
+
+            return lambda_client, iam_client
+    return MockedLambdaStitcherConstructor()
+

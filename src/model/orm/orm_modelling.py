@@ -17,5 +17,9 @@ class ORMTikeeShotIdentifier(BaseModel):
         description="SK is formed from photo number and side such as 1#left or #left"
     )
 
+
+
 class ORMTikeeShot(ORMTikeeShotIdentifier, TikeeShotDefinition, TikeeMetadata, TikeetShotComputedProperties):
     """ORM-facing tikee shot model for persistence."""
+    def build_s3_path(self) -> str:
+        return f"{self.camera_id}/{self.sequence}/{self.side.value}/{self.photo_name}"
