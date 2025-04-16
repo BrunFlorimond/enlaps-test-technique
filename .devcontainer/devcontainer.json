@@ -20,7 +20,8 @@
 				"AmazonWebServices.aws-toolkit-vscode",
 				"Boto3typed.boto3-ide",
 				"aws-scripting-guy.cform",
-				"ms-python.isort"
+				"ms-python.isort",
+				"github.vscode-pull-request-github"
 			]
 		},
 		"settings": {
