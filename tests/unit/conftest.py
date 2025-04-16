@@ -15,7 +15,7 @@ def tikee_shot_table():
 
         def create_tikee_shot_table(self):
             """Create a tikee_shot table"""
-            dynamodb = boto3.resource("dynamodb")
+            dynamodb = boto3.resource("dynamodb", constants.AWS_REGION)
 
             key_schema = constants.DDB_KEYS
             attribute_definitions = constants.DDB_ATTRIBUTE
@@ -43,7 +43,7 @@ def stitcher_lambda():
 
         def create_stitcher_lambda(self):
             """Create mocked Lambda"""
-            iam_client = boto3.client('iam')
+            iam_client = boto3.client('iam', constants.AWS_REGION)
 
             assume_role_policy_document = {
                 "Version": "2012-10-17",
@@ -64,7 +64,7 @@ def stitcher_lambda():
             )
 
             # Create mock lambda
-            lambda_client = boto3.client('lambda')
+            lambda_client = boto3.client('lambda', constants.AWS_REGION)
             lambda_client.create_function(
                 FunctionName=constants.LAMBDA_STITCHER,
                 Runtime='python3.13',

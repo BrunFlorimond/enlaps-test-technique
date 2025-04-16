@@ -7,6 +7,7 @@ from uuid import UUID
 
 from src.model.business.business_modelling import NewTikeeShot, TikeeShotSide
 from src.model.orm.orm_modelling import ORMTikeeShot, ORMTikeeShotIdentifier
+from src.constants.constants import AWS_REGION
 
 
 class TikeeShotServices:
@@ -15,7 +16,7 @@ class TikeeShotServices:
     def __init__(self):
         """Instanciate a TikeeShotService object storing table in which to write"""
         self.table_name = constants.DDB_TABLE_NAME
-        dynamodb = boto3.resource("dynamodb")
+        dynamodb = boto3.resource("dynamodb", AWS_REGION)
         self.tikee_shot_table = dynamodb.Table(constants.DDB_TABLE_NAME)
 
     def create(self, new_tikee_shot: NewTikeeShot) -> ORMTikeeShot:

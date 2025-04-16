@@ -18,7 +18,7 @@ logger.setLevel(logging.INFO)
 
 
 
-lambda_client = boto3.client('lambda')
+
 
 
 def lambda_handler(event, _):
@@ -52,8 +52,9 @@ def lambda_handler(event, _):
                             "left_side_s3_path": left_side.build_s3_path(),
                             "right_side_s3_path": right_side.build_s3_path()
                         }})
+                    lambda_client = boto3.client('lambda', AWS_REGION)
                     lambda_client.invoke(
-                        FunctionName=f"arn:aws:lambda:{AWS_REGION}:{int(AWS_ACCOUNT_ID)}:function:{LAMBDA_STITCHER}",
+                        FunctionName=f"arn:aws:lambda:{AWS_REGION}:{AWS_ACCOUNT_ID}:function:{LAMBDA_STITCHER}",
                         InvocationType='Event',
                         Payload=input
                     )
